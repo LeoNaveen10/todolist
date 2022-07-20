@@ -1,36 +1,45 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+<div class="header-bar">
+    <div>
+        <!-- title will make it captial -->
+        <h1>Hello {{request.user|title}}</h1> 
+        <h3 style="margin: 0;">You have <i> {{count}}</i> incomplete task{{ count|pluralize:'s' }}</h3>
+    </div>
+
 {% if request.user.is_authenticated %}
-    <p> {{ request.user}}</p>
     <a href="{% url 'logout'%}"> logout</a>
 {% else %}
     <a href="{% url 'login' %}"> login</a>
 
 {% endif%}
-    <hr>
-<h1>
-    TO DO LIST
-</h1>
-<a href=" {% url 'create-task' %} ">create task</a>
+</div>
+<div id="search-add-wrapper">
+    <form method="get" style="margin-top:20px;display:flex">
+        <input type="text" name="search-area" value="{{search_input}}">
+        <input class="button" type="submit" value="search">
+    </form>
+    <a id="add-link" href="{% url 'create-task' %}">&#x2b;</a>
+</div>
+<div class="task-item-wrapper">
+{% for task in tasks %}
+ <div class="task-wrapper">
+    {% if task.complete %} 
+    <div class="task-title">
+        <div class="task-complete-icon"></div>
+        <i><s><a href="{% url 'update-task' task.id %}">{{task}}</a></s></i>
+    </div>
+    <a class="delete-link" href="{% url 'delete-task' task.id%}">&#215</a>
+    {% else %}
+    <div class="task-title">
+        <div class="task-incomplete-icon"></div>
+        <a href="{% url 'update-task' task.id %}">{{task}}</a>
+    </div>
+    <a class="delete-link" href="{% url 'delete-task' task.id%}">&#215</a>
+    {% endif %}   
+</div>
+{% endfor %}
+</div>
 
-<form method="get" >
-    <input type="text" name="search-area" value="{{search_input}}">
-    <input type="submit" value="search">
-</form>
-
-<table>
-    <tr>
-        <th>
-            Tasks
-        </th>
-    </tr>
-    {% for task in tasks %}
-    <tr>
-        <td> {{task.title}}</td>
-        <td> <a href="{% url 'task' task.id %}"> view</a>   </td>
-        <td> <a href="{% url 'update-task' task.id %}"> Edit</a>   </td>
-        <td> <a href="{% url 'delete-task' task.id %}"> delete</a>   </td>
-
-    </tr>
-    {% empty %}
-     <h3> no items in list bro</h3>
-    {%endfor%}
-</table>
+{% endblock content %}
